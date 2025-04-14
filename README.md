@@ -19,3 +19,8 @@ Como dito no início, trata-se de um sistema de uma loja genérica, então sendo
 - Listar os mencionados acima, sendo possível uma filtragem, como por exemplo: a partir da data de cadastro para os clientes
 ---
 # 🛠️ Futuras melhorias 
+- Menu geral, a partir desse menu será possível selecionar onde você deseja acessar, se é a parte do cliente, vendedor, produtos...
+- Acréscimo do menu de vendas para realizar operações de vendas e atualizar para cada venda realizada
+- Melhoria de algumas partes do código para tratar algumas exceções
+- Adição de um menu dedicado aos fornecedores
+
