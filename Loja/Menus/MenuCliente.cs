@@ -3,6 +3,7 @@ using Loja.DataBase.Repositories;
 using Loja.Menus;
 using Loja.Models;
 using Loja.Busca;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Loja.Menus_Geral_;
 public class MenuCliente : MenuPrincipal
@@ -93,8 +94,8 @@ public class MenuCliente : MenuPrincipal
                 RepositorioGenerico<Vendedor> repositorioVendedor = new RepositorioGenerico<Vendedor>(context);
                 if (consultaVendedor is not null)
                 {
-                    var novoCliente = new Cliente() { Nome = cliente };
                     base.LimparTela();
+                    var novoCliente = new Cliente() { Nome = cliente };
                     novoCliente.Vendedor = consultaVendedor;
                     repositorioCliente.Adicionar(novoCliente);
                     Console.WriteLine("Cadastro finalizado!");
@@ -103,13 +104,57 @@ public class MenuCliente : MenuPrincipal
                 {
                     base.LimparTela();
                     Console.WriteLine($"Não existe o vendedor {vendedor} no sistema!");
-
+                    resp = " ";
+                    while (resp != "S" && resp != "N")
+                    {
+                        base.PressioneEProssiga();
+                        Console.WriteLine("Deseja cadastrar outro vendedor [S/N]");
+                        resp = Console.ReadLine()!.ToUpper();
+                        if (resp == "S")
+                        {
+                            while (resp == "S")
+                            {
+                                base.LimparTela();
+                                Console.WriteLine("Informe o nome do vendedor:");
+                                vendedor = Console.ReadLine()!;
+                                var consultarNovamente = busca.BuscaVendedor(vendedor);
+                           
+                                if (consultarNovamente is not null)
+                                {
+                                    base.LimparTela();
+                                    var novoCliente = new Cliente() { Nome = cliente };
+                                    novoCliente.Vendedor = consultarNovamente;
+                                    repositorioCliente.Adicionar(novoCliente);
+                                    Console.WriteLine("Cadastro finalizado!");
+                                    break;
+                                }
+                                else
+                                {
+                                    base.LimparTela();
+                                    Console.WriteLine($"Não existe o vendedor {vendedor} no sistema!");
+                                    Console.WriteLine("Deseja cadastrar outro vendedor [S/N]");
+                                    resp = Console.ReadLine()!.ToUpper();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            base.LimparTela();
+                            Console.WriteLine("Tudo bem! O cliente será cadastrado e poderá ser vinculado um vendedor no futuro!");
+                            var novoCliente = new Cliente() { Nome = cliente };
+                            repositorioCliente.Adicionar(novoCliente);
+                            break;
+                        }
+                    }
                 }
             }
             else
             {
                 base.LimparTela();
                 Console.WriteLine("Cadastro finalizado!");
+                var novoCliente = new Cliente() { Nome = cliente };
+                repositorioCliente.Adicionar(novoCliente);
+                 
             }
         }  
     }
@@ -160,8 +205,6 @@ public class MenuCliente : MenuPrincipal
                     {
                         base.LimparTela();
                         Console.WriteLine($"Já existe o nome {buscaCliente.Nome} cadastrado no sistema!");
-                       
-
                     }
                     else
                     {
@@ -177,24 +220,29 @@ public class MenuCliente : MenuPrincipal
                      base.ExibirTexto("Alterar vendedor do cliente");
                      Console.WriteLine("Informe o nome do vendedor:");
                      string vendedor = Console.ReadLine()!;
-                     RepositorioGenerico<Cliente> repositorioCliente = new(context);
                      Buscas buscaVendedor = new Buscas(context);
-                     var consultaVendedor = buscaVendedor.BuscaVendedor(vendedor); 
-                     if(consultaVendedor is not null)
-                     {
-                       base.LimparTela();
-                       cliente.Vendedor = consultaVendedor;
-                       Console.WriteLine($"Vendedor {consultaVendedor.Nome} foi vinculado a {cliente.Nome}");
-                       clienteRepositorio.Atualizar(cliente);
+                     var consultaVendedor = buscaVendedor.BuscaVendedor(vendedor);
+                if (consultaVendedor is not null)
+                {
+                    if(cliente.VendedorId == consultaVendedor.Id)
+                    {
+                        base.LimparTela();
+                        Console.WriteLine($"O vendedor já está vinculado a este cliente!");
+                    }
+                    else
+                    {
+                        base.LimparTela();
+                        cliente.Vendedor = consultaVendedor;
+                        Console.WriteLine($"Vendedor {consultaVendedor.Nome} foi vinculado a {cliente.Nome}");
+                        clienteRepositorio.Atualizar(cliente);
+                    }
                 }
                 else
-                     {
-                       base.LimparTela();
-                       Console.WriteLine($"Nome {vendedor} não foi encontrado!");
-                     }
-                   
+                {
+                    base.LimparTela();
+                    Console.WriteLine($"Nome {vendedor} não foi encontrado!");
+                }
                     break;
-
                 case 3:
                      base.LimparTela();
                      Console.WriteLine("Voltando ao menu principal");
@@ -247,6 +295,7 @@ public class MenuCliente : MenuPrincipal
     {
         base.LimparTela();
         RepositorioGenerico<Cliente> repositorioCliente = new (context);
+        Buscas busca = new Buscas(context);
         int opcao = 0;
         while(opcao != 1 && opcao != 2 && opcao != 3 && opcao != 4)
         {
@@ -256,17 +305,16 @@ public class MenuCliente : MenuPrincipal
                 Console.WriteLine("\n1 - [Listagem A - Z]");
                 Console.WriteLine("2 - [Listar por data de cadastro]");
                 Console.WriteLine("3 - [Listar por maior número de compras]");
-                Console.WriteLine("4 - [Sair]");
+                Console.WriteLine("4 - [Listar por vendedor]");
+                Console.WriteLine("5 - [Sair]");
                 Console.WriteLine("\n Digite a opção escolhida:");
                 opcao = int.Parse(Console.ReadLine()!);
                 base.LimparTela();
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Opção inválida");
                 base.PressioneEProssiga();
-
             }
         }
         switch (opcao)
@@ -276,9 +324,16 @@ public class MenuCliente : MenuPrincipal
                 base.ExibirTexto("Imprimindo lista de clientes em ordem alfabética:");
                 Console.WriteLine("");
                 var listaDeClientes =  repositorioCliente.ListarCliente();
-                foreach (var clientes in listaDeClientes)//validar se não for nulo
+                if(listaDeClientes is not null || listaDeClientes.Count() > 0)
                 {
-                    clientes.Informacoes();
+                    foreach (var clientes in listaDeClientes)
+                    {
+                        clientes.Informacoes();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("A lista se encontra vazia!");
                 }
                 break;
 
@@ -291,11 +346,18 @@ public class MenuCliente : MenuPrincipal
                 Console.WriteLine("");
 
                 var listaDeClientePorData = repositorioCliente.ListarPor(c => c.DataCadastro.Year.Equals(anoDeBusca));
-                foreach(var clientes in listaDeClientePorData)
+                if (listaDeClientePorData is null || listaDeClientePorData.Count() == 0)
                 {
-                    Console.WriteLine($"Nome: {clientes.Nome} - Data de cadastro: {clientes.Nome}");
+                    base.LimparTela();
+                    Console.WriteLine("A lista encontra-se vazia!");
                 }
-
+                else
+                {
+                    foreach (var clientes in listaDeClientePorData)
+                    {
+                        Console.WriteLine($"Nome: {clientes.Nome} - Data de cadastro: {clientes.DataCadastro.Day}/{clientes.DataCadastro.Month}/{clientes.DataCadastro.Year}");
+                    }
+                }
                 break;
 
             case 3:
@@ -303,17 +365,60 @@ public class MenuCliente : MenuPrincipal
                 base.ExibirTexto("Imprimindo lista de cliente por maior número de compras:");
                 Console.WriteLine("");
                 var listaDeClientesPorCompras = repositorioCliente.Listar().OrderByDescending(c => c.TotalComprado);
-                foreach(var clientes in listaDeClientesPorCompras)
+                if (listaDeClientesPorCompras is null || listaDeClientesPorCompras.Count() == 0) 
                 {
-                    Console.WriteLine($"Nome: {clientes.Nome} - Total comprado: {clientes.TotalComprado}");
-                    Console.WriteLine("-----------------------------------------------------------------");
+                    base.LimparTela();
+                    Console.WriteLine("A lista encotra-se vazia!");
+                }
+                else
+                {
+                    foreach (var clientes in listaDeClientesPorCompras)
+                    {
+                        Console.WriteLine($"Nome: {clientes.Nome} - Total comprado: {clientes.TotalComprado}");
+                        Console.WriteLine("-----------------------------------------------------------------");
+                    }
                 }
                 break;
             case 4:
                 base.LimparTela();
+                string resp = "S";
+                while (resp == "S")
+                {
+                    Console.WriteLine("Informe o nome do vendedor:");
+                    string vendedor = Console.ReadLine()!;
+                    var buscaVendedor = busca.BuscaVendedor(vendedor);
+                    if (buscaVendedor is not null)
+                    {
+                        var clienteVendedor = repositorioCliente.ListarPor(c => c.VendedorId.Equals(buscaVendedor.Id));
+                        base.LimparTela();
+                        base.ExibirTexto($"Imprimindo lista de clientes do vendedor {vendedor}:");
+                        if( clienteVendedor is not null && clienteVendedor!.Count() > 0)
+                        {
+                            foreach (var clientes in clienteVendedor)
+                            {
+                                Console.WriteLine($"Nome: {clientes.Nome}");
+                                Console.WriteLine("--------------------------------");
+                            }
+                        }
+                        else
+                        {
+                            base.LimparTela();
+                            Console.WriteLine("A lista se encontra vazia!");
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"O vendedor {vendedor} não foi encontrado!");
+                        Console.WriteLine("Deseja buscar novamente [S/N]?");
+                        resp = Console.ReadLine()!;
+                    }
+                }
+                    break;
+            case 5:
+                base.LimparTela();
                 Console.WriteLine("Voltando ao menu");
                 break;
-
             default:
                 base.LimparTela();
                 Console.WriteLine("Opção inválida!");

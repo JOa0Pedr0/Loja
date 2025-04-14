@@ -19,7 +19,7 @@ public class MenuPrincipal
     }
     public void PressioneEProssiga()
     {
-        Console.WriteLine("Pressione qualquer tecla para prosseguir");
+        Console.WriteLine("Pressione qualquer tecla para prosseguir.");
         Console.ReadKey();
         Console.Clear();
 

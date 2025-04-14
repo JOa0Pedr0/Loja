@@ -32,16 +32,6 @@ var filtrarVendedorPorVendaBruta = context.Vendedores!.Where(v => v.VendaBruta >
 #endregion
 
 
-//var repositorioVendedor = new RepositorioGenerico<Vendedor>(context);
-//Console.WriteLine("Qual o vendedor?");
-//string vendedor = Console.ReadLine()!;
-//var vendedorAchado = repositorioVendedor.Busca(v => v.Nome.Equals(vendedor));
-
-//var listarClientePorVendedor = repositorioCliente.ListarPor(c => c.Vendedor!.Nome.Equals(vendedor);
-//foreach(var cliente in listarClientePorVendedor)
-//{
-//    Console.WriteLine(cliente.Nome);
-//}
 var menu = new MenuCliente();
 //menu.Menu();
 var menuV = new MenuVendedor();

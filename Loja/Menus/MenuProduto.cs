@@ -62,9 +62,8 @@ public class MenuProduto : MenuPrincipal
 
                 break;
         }
-           
-    }
 
+    }
     public void Cadastro(LojaContext context)
     {
         base.LimparTela();
@@ -76,7 +75,7 @@ public class MenuProduto : MenuPrincipal
         var consultarProduto = busca.BuscaProduto(nomeProduto);
         double preco = 0;
         if (consultarProduto is null)
-        { 
+        {
             try
             {
                 base.LimparTela();
@@ -90,10 +89,9 @@ public class MenuProduto : MenuPrincipal
                 base.LimparTela();
 
             }
-
             Console.WriteLine($"Infome o fornecedor de {nomeProduto}:");
-                string nomeFornecedor = Console.ReadLine()!;
-                var consultarFornecedor = busca.BuscaFornecedor(nomeFornecedor);
+            string nomeFornecedor = Console.ReadLine()!;
+            var consultarFornecedor = busca.BuscaFornecedor(nomeFornecedor);
             if (consultarFornecedor is null)
             {
                 base.LimparTela();
@@ -121,10 +119,9 @@ public class MenuProduto : MenuPrincipal
                 else
                 {
                     base.LimparTela();
-                    Console.WriteLine("Voltando ao menu...");
+                    Console.WriteLine("Cancelando cadastro.\nVoltando ao menu...");
 
                 }
-
             }
             else
             {
@@ -143,7 +140,6 @@ public class MenuProduto : MenuPrincipal
             Thread.Sleep(1500);
         }
     }
-
     public void Remover(LojaContext context)
     {
         base.LimparTela();
@@ -153,22 +149,20 @@ public class MenuProduto : MenuPrincipal
         Console.WriteLine("Informe o nome do produto que deseja excluir:");
         string nomeProduto = Console.ReadLine()!;
         var consultaProduto = busca.BuscaProduto(nomeProduto);
-        if(consultaProduto is not null)
+        if (consultaProduto is not null)
         {
             base.LimparTela();
             string resp = "";
-            while(resp != "S" && resp != "N")
+            while (resp != "S" && resp != "N")
             {
                 Console.WriteLine($"Tem certeza que deseja excluir permanentemente o produto {consultaProduto.Nome}? [S/N]");
                 resp = Console.ReadLine()!.ToUpper();
             }
-            if(resp == "S")
+            if (resp == "S")
             {
                 base.LimparTela();
                 Console.WriteLine("Excluindo dados...");
                 repositorioProduto.Excluir(consultaProduto);
-             
-
             }
             else
             {
@@ -181,9 +175,7 @@ public class MenuProduto : MenuPrincipal
             base.LimparTela();
             Console.WriteLine($"O produto {nomeProduto} não foi encontrado no banco de dados!");
         }
-
     }
-    
     public void Listar(LojaContext context)
     {
         RepositorioGenerico<Produto> repositorioProduto = new(context);
@@ -191,16 +183,16 @@ public class MenuProduto : MenuPrincipal
         base.LimparTela();
         base.ExibirTexto("Lista de produtos");
         int opcao = 0;
-        while(opcao != 1 && opcao != 2 && opcao != 3)
+        while (opcao != 1 && opcao != 2 && opcao != 3)
         {
             try
             {
-                Console.WriteLine("[Listagem de A - Z]");
-                Console.WriteLine("[Lista de produto por fornecedor]");
-                Console.WriteLine("[Lista de produto por maior valor]");
+                Console.WriteLine("1 - [Listagem de A - Z]");
+                Console.WriteLine("2 - [Lista de produto por fornecedor]");
+                Console.WriteLine("3 - [Lista de produto por maior valor]");
                 opcao = int.Parse(Console.ReadLine()!);
-
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 Console.WriteLine("Opção inválid!");
                 base.PressioneEProssiga();
@@ -212,18 +204,17 @@ public class MenuProduto : MenuPrincipal
                 base.LimparTela();
                 base.ExibirTexto("Lista de produtos A - Z");
                 var listaProdutosAZ = repositorioProduto.Listar().OrderBy(p => p.Nome);
-                foreach(var produto in listaProdutosAZ)
+                foreach (var produto in listaProdutosAZ)
                 {
                     Console.WriteLine(produto.Nome);
                 }
                 break;
-
             case 2:
                 base.LimparTela();
-                Console.WriteLine("Informe o nome do forncedor que deseja buscar:");
+                Console.WriteLine("Informe o nome do fornecedor que deseja buscar:");
                 string fornecedor = Console.ReadLine()!;
                 var consultarFornecedor = busca.BuscaFornecedor(fornecedor);
-                if(consultarFornecedor is null)
+                if (consultarFornecedor is null)
                 {
                     base.LimparTela();
                     Console.WriteLine("O fornecedor informado não existe!");
@@ -232,12 +223,12 @@ public class MenuProduto : MenuPrincipal
                 {
                     base.LimparTela();
                     var listaProdutosFornecedor = repositorioProduto.ListarPor(p => p.Fornecedor!.Nome.Equals(consultarFornecedor.Nome));
-                    if(listaProdutosFornecedor is null || !listaProdutosFornecedor.Any()) 
+                    if (listaProdutosFornecedor is null || !listaProdutosFornecedor.Any())
                     {
                         base.LimparTela();
                         Console.WriteLine("O fornecedor ainda não possui produtos cadastrados!");
                     }
-                    else 
+                    else
                     {
                         base.ExibirTexto($"Produtos do forncedor {consultarFornecedor.Nome}");
 
@@ -246,15 +237,13 @@ public class MenuProduto : MenuPrincipal
                             Console.WriteLine(produto.Nome);
                         }
                     }
-                   
                 }
-                
                 break;
 
             case 3:
                 base.LimparTela();
                 var listaProdutosPorMaiorValor = repositorioProduto.Listar().OrderByDescending(p => p.Preco);
-                if(listaProdutosPorMaiorValor is null || !listaProdutosPorMaiorValor.Any())
+                if (listaProdutosPorMaiorValor is null || !listaProdutosPorMaiorValor.Any())
                 {
                     base.LimparTela();
                     Console.WriteLine("A lista de produtos se encotra vazia no momento!");
@@ -263,42 +252,38 @@ public class MenuProduto : MenuPrincipal
                 {
                     base.LimparTela();
                     base.ExibirTexto("Lista de produtos por maior preço");
+                    Console.WriteLine();
                     foreach (var produto in listaProdutosPorMaiorValor)
                     {
-                        Console.WriteLine($" Produto: {produto.Nome}, Valor: R${produto.Preco}");
+                        Console.WriteLine($" Produto: {produto.Nome}, Valor: R$ {produto.Preco}");
                     }
                 }
-               
                 break;
             default:
 
                 break;
-
-
-
         }
-
     }
-
     public void Atualizar(LojaContext context)
     {
         base.LimparTela();
         RepositorioGenerico<Produto> repositorioProduto = new(context);
         Buscas busca = new(context);
 
-        Console.WriteLine("Informe o nome do produto que deseja atualzar:");
+        Console.WriteLine("Informe o nome do produto que deseja atualizar:");
         string nomeProduto = Console.ReadLine()!;
+        Console.Clear();
         var consultarProduto = busca.BuscaProduto(nomeProduto);
 
-        if( consultarProduto is null)
+        if (consultarProduto is null)
         {
             base.LimparTela();
             Console.WriteLine("Produto não encontrado!");
         }
-        else 
+        else
         {
             int opcao = 0;
-            while( opcao != 1 && opcao != 2 && opcao != 3)
+            while (opcao != 1 && opcao != 2 && opcao != 3)
             {
                 try
                 {
@@ -307,11 +292,11 @@ public class MenuProduto : MenuPrincipal
                     Console.WriteLine("[3 - Alterar preço]");
                     opcao = int.Parse(Console.ReadLine()!);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
+                    Console.WriteLine("Entrada inválida!");
 
-
-                } 
+                }
             }
             switch (opcao)
             {
@@ -320,17 +305,25 @@ public class MenuProduto : MenuPrincipal
                     Console.WriteLine($"Informe o nome do novo fornecedor para {consultarProduto.Nome}:");
                     string novoFornecedor = Console.ReadLine()!;
                     var consultarFornecedor = busca.BuscaFornecedor(novoFornecedor);
-                    if(novoFornecedor is null)
+                    if (consultarFornecedor is null)
                     {
                         base.LimparTela();
                         Console.WriteLine("Fornecedor não existe no sistema!");
                     }
                     else
                     {
-                        base.LimparTela();
-                        consultarProduto.Fornecedor = consultarFornecedor;
-                        repositorioProduto.Atualizar(consultarProduto);
-                        Console.WriteLine($"Atualização do produto {consultarProduto.Nome} foi realizada!");
+                        if(consultarFornecedor.Id == consultarProduto.FornecedorId)
+                        {
+                            base.LimparTela();
+                            Console.WriteLine("Este fornecedor já pertence a esse cliente!");
+                        }
+                        else
+                        {
+                            base.LimparTela();
+                            consultarProduto.Fornecedor = consultarFornecedor;
+                            repositorioProduto.Atualizar(consultarProduto);
+                            Console.WriteLine($"Atualização do produto {consultarProduto.Nome} foi realizada!");
+                        }
                     }
                     break;
                 case 2:
@@ -338,7 +331,7 @@ public class MenuProduto : MenuPrincipal
                     Console.WriteLine("Informe o novo nome para o produto digitado:");
                     string novoNomeProduto = Console.ReadLine()!;
                     var consultarExistenciaProduto = busca.BuscaProduto(novoNomeProduto);
-                    if(consultarExistenciaProduto is not null)
+                    if (consultarExistenciaProduto is not null)
                     {
                         base.LimparTela();
                         Console.WriteLine("Já existe produto com esse nome!");
@@ -360,17 +353,18 @@ public class MenuProduto : MenuPrincipal
                         double novoPreco = double.Parse(Console.ReadLine()!);
                         consultarProduto.Preco = novoPreco;
                         repositorioProduto.Atualizar(consultarProduto);
-                    }catch(Exception ex)
+                    }
+                    catch (Exception ex)
                     {
                         Console.WriteLine("entrada inválida!");
                     }
-                    
+
                     break;
                 default:
                     Console.WriteLine("Opção indisponível!");
                     break;
             }
-           
+
         }
 
     }

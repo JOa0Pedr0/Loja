@@ -2,17 +2,17 @@
 using Loja.DataBase.Context;
 using Loja.DataBase.Repositories;
 using Loja.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Channels;
-using System.Threading.Tasks;
 
 namespace Loja.Menus
 {
     public class MenuVendas : MenuPrincipal
     {
+        /*
+         * Realizar venda 
+         * Informar o cliente
+         * atualizar status a cada venda [cliente e vendedor]
+         * cancelar uma venda
+         */
         LojaContext lojaContext = new LojaContext();
         public void Menu()
         {
